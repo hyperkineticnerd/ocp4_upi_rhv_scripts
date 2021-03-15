@@ -1,0 +1,20 @@
+apiVersion: tuned.openshift.io/v1
+kind: Tuned
+metadata:
+  name: writethrough
+  namespace: openshift-cluster-node-tuning-operator
+spec:
+  profile:
+  - data: |
+      [main]
+      summary=Don't care about consistency
+      include=openshift-control-plane
+      [sysfs]
+      /sys/block/sda/queue/write_cache=write through
+    name: writethrough-tuner
+  recommend:
+  - match:
+    - label: node-role.kubernetes.io/master
+    - label: node-role.kubernetes.io/infra
+    priority: 20
+    profile: writethrough-tuner

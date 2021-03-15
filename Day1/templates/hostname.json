@@ -1,0 +1,16 @@
+{
+  "append" : false,
+  "mode" : 420,
+  "filesystem" : "root",
+  "path" : "/etc/hostname",
+  "contents" : {
+    "source" : "data:text/plain;charset=utf-8;base64,\($HN)",
+    "verification" : {}
+  },
+  "user" : {
+    "name" : "root"
+  },
+  "group": {
+    "name": "root"
+  }
+}

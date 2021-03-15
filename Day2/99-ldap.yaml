@@ -1,0 +1,29 @@
+# oc create secret generic ldap-secret --from-literal=bindPassword=<secret> -n openshift-config
+# oc create configmap ca-config-map --from-file=ca.crt=/path/to/ca -n openshift-config
+# ---
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+  - name: ldap-ipa
+    mappingMethod: claim
+    type: LDAP
+    ldap:
+      attributes:
+        id:
+        - dn
+        email:
+        - mail
+        name:
+        - cn
+        preferredUsername:
+        - uid
+      bindDN: "uid=ldap,cn=users,cn=accounts,dc=hkn,dc=lab"
+      bindPassword:
+        name: ldap-secret
+      ca:
+        name: ca-config-map
+      insecure: false
+      url: "ldap://ipa.hkn.lab:636/cn=users,cn=accounts,dc=hkn,dc=lab?uid"

@@ -1,0 +1,16 @@
+{
+  "append" : false,
+  "mode" : 420,
+  "filesystem" : "root",
+  "path" : "/etc/NetworkManager/conf.d/hostname-mode.conf",
+  "contents" : {
+    "source" : "data:text/plain;charset=utf-8;base64,\($HM)",
+    "verification" : {}
+  },
+  "user" : {
+    "name" : "root"
+  },
+  "group": {
+    "name": "root"
+  }
+}

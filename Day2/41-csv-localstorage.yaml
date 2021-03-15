@@ -1,0 +1,465 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "local.storage.openshift.io/v1",
+          "kind": "LocalVolume",
+          "metadata": {
+            "name": "example"
+          },
+          "spec": {
+            "storageClassDevices": [
+              {
+                "devicePaths": [
+                    "/dev/vde",
+                    "/dev/vdf"
+                ],
+                "fsType": "ext4",
+                "storageClassName": "foobar",
+                "volumeMode": "Filesystem"
+              }
+            ]
+          }
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: Storage
+    containerImage: registry.redhat.io/openshift4/ose-local-storage-operator@sha256:98a9c2a92c74cd89056fac23e4b20a3f646e2a7966c8ccc1715d962865c1f0ea
+    createdAt: "2019-08-14T00:00:00Z"
+    description: |
+      Configure and use local storage volumes in kubernetes and OpenShift. OpenShift 4.2 and above is only supported OpenShift versions.
+    olm.operatorGroup: openshift-storage-operatorgroup
+    olm.operatorNamespace: openshift-storage
+    olm.skipRange: '>=4.3.0 <4.4.0-202007120152.p0'
+    olm.targetNamespaces: openshift-storage
+    repository: https://github.com/openshift/local-storage-operator
+    support: Red Hat
+  creationTimestamp: "2020-08-01T22:27:10Z"
+  generation: 4
+  labels:
+    olm.api.2fb343305a725ca1: provided
+    operator-metering: "true"
+  name: local-storage-operator.4.4.0-202007120152.p0
+  namespace: openshift-storage
+  resourceVersion: "390652"
+  selfLink: /apis/operators.coreos.com/v1alpha1/namespaces/openshift-storage/clusterserviceversions/local-storage-operator.4.4.0-202007120152.p0
+  uid: 1114b850-a320-4dec-9b05-48f344a5f507
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Manage local storage volumes for OpenShift
+      displayName: Local Volume
+      kind: LocalVolume
+      name: localvolumes.local.storage.openshift.io
+      specDescriptors:
+      - description: User requested management state of this object
+        displayName: Requested management state
+        path: managementState
+      - description: Log level of local volume diskmaker and provisioner for this
+          object
+        displayName: LogLevel
+        path: logLevel
+      - description: Selected nodes for local storage
+        displayName: NodeSelector
+        path: nodeSelector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:selector
+      - description: StorageClass devices configured by this object
+        displayName: StorageClassDevices
+        path: storageClassDevices
+      statusDescriptors:
+      - description: Last generation of this object
+        displayName: ObservedGeneration
+        path: observedGeneration
+      - description: Current management state of this object
+        displayName: Operator management state
+        path: managementState
+      - description: Last known condition of this object
+        displayName: Conditions
+        path: conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+      version: v1
+  description: Local Storage Operator
+  displayName: Local Storage
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - storageclasses
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterroles
+          - clusterrolebindings
+          - rolebindings
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumeclaims
+          - events
+          verbs:
+          - '*'
+        - apiGroups:
+          - events.k8s.io
+          resources:
+          - events
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumes
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - delete
+        serviceAccountName: local-storage-operator
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: local-storage-admin
+      deployments:
+      - name: local-storage-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: local-storage-operator
+          strategy: {}
+          template:
+            metadata:
+              creationTimestamp: null
+              labels:
+                name: local-storage-operator
+            spec:
+              containers:
+              - command:
+                - local-storage-operator
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: OPERATOR_NAME
+                  value: local-storage-operator
+                - name: PROVISIONER_IMAGE
+                  value: registry.redhat.io/openshift4/ose-local-storage-static-provisioner@sha256:9703fb932529a8953550ab9c8090fe04483ce95f2660b4c614d9f3c9af899010
+                - name: DISKMAKER_IMAGE
+                  value: registry.redhat.io/openshift4/ose-local-storage-diskmaker@sha256:14269390e9bb39d46cdabbdabd4f1fe47f17931adcabac14731629a0a935ba8a
+                image: registry.redhat.io/openshift4/ose-local-storage-operator@sha256:cc358feb2f9479c870e4a038a27b87599fb64d4f5375066d462b9dd118108275
+                imagePullPolicy: Always
+                name: local-storage-operator
+                ports:
+                - containerPort: 60000
+                  name: metrics
+                resources: {}
+              serviceAccountName: local-storage-operator
+      permissions:
+      - rules:
+        - apiGroups:
+          - local.storage.openshift.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - roles
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - '*'
+        serviceAccountName: local-storage-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - storage
+  - local storage
+  labels:
+    alm-owner-metering: local-storage-operator
+    alm-status-descriptors: local-storage-operator.4.4.0-202007120152.p0
+  links:
+  - name: Documentation
+    url: https://github.com/openshift/local-storage-operator/tree/master/docs
+  - name: Source Repository
+    url: https://github.com/openshift/local-storage-operator
+  maintainers:
+  - email: aos-storage-staff@redhat.com
+    name: Red Hat
+  maturity: stable
+  minKubeVersion: 1.14.0
+  provider:
+    name: Red Hat
+  selector:
+    matchLabels:
+      alm-owner-metering: local-storage-operator
+  version: 4.4.0-202007120152.p0
+status:
+  conditions:
+  - lastTransitionTime: "2020-08-01T23:13:03Z"
+    lastUpdateTime: "2020-08-01T23:13:03Z"
+    message: 'install strategy failed: etcdserver: leader changed'
+    phase: Failed
+    reason: InstallComponentFailed
+  - lastTransitionTime: "2020-08-01T23:13:19Z"
+    lastUpdateTime: "2020-08-01T23:13:19Z"
+    message: 'installing: deployment changed old hash=797f966dfb, new hash=7b855454dd'
+    phase: Pending
+    reason: NeedsReinstall
+  - lastTransitionTime: "2020-08-01T23:13:20Z"
+    lastUpdateTime: "2020-08-01T23:13:20Z"
+    message: all requirements found, attempting install
+    phase: InstallReady
+    reason: AllRequirementsMet
+  - lastTransitionTime: "2020-08-01T23:13:20Z"
+    lastUpdateTime: "2020-08-01T23:13:20Z"
+    message: waiting for install components to report healthy
+    phase: Installing
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-01T23:13:20Z"
+    lastUpdateTime: "2020-08-01T23:13:21Z"
+    message: |
+      installing: waiting for deployment local-storage-operator to become ready: Waiting for deployment spec update to be observed...
+    phase: Installing
+    reason: InstallWaiting
+  - lastTransitionTime: "2020-08-01T23:13:33Z"
+    lastUpdateTime: "2020-08-01T23:13:33Z"
+    message: install strategy completed with no errors
+    phase: Succeeded
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-01T23:43:55Z"
+    lastUpdateTime: "2020-08-01T23:43:55Z"
+    message: requirements no longer met
+    phase: Failed
+    reason: RequirementsNotMet
+  - lastTransitionTime: "2020-08-01T23:44:04Z"
+    lastUpdateTime: "2020-08-01T23:44:04Z"
+    message: install strategy completed with no errors
+    phase: Succeeded
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-02T00:09:37Z"
+    lastUpdateTime: "2020-08-02T00:09:37Z"
+    message: requirements no longer met
+    phase: Failed
+    reason: RequirementsNotMet
+  - lastTransitionTime: "2020-08-02T00:10:14Z"
+    lastUpdateTime: "2020-08-02T00:10:14Z"
+    message: install strategy completed with no errors
+    phase: Succeeded
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-02T00:15:25Z"
+    lastUpdateTime: "2020-08-02T00:15:25Z"
+    message: requirements no longer met
+    phase: Failed
+    reason: RequirementsNotMet
+  - lastTransitionTime: "2020-08-02T00:15:54Z"
+    lastUpdateTime: "2020-08-02T00:15:54Z"
+    message: requirements not met
+    phase: Pending
+    reason: RequirementsNotMet
+  - lastTransitionTime: "2020-08-02T00:16:49Z"
+    lastUpdateTime: "2020-08-02T00:16:49Z"
+    message: all requirements found, attempting install
+    phase: InstallReady
+    reason: AllRequirementsMet
+  - lastTransitionTime: "2020-08-02T00:16:52Z"
+    lastUpdateTime: "2020-08-02T00:16:52Z"
+    message: waiting for install components to report healthy
+    phase: Installing
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-02T00:16:52Z"
+    lastUpdateTime: "2020-08-02T00:16:56Z"
+    message: |
+      installing: waiting for deployment local-storage-operator to become ready: Waiting for deployment spec update to be observed...
+    phase: Installing
+    reason: InstallWaiting
+  - lastTransitionTime: "2020-08-02T00:18:50Z"
+    lastUpdateTime: "2020-08-02T00:18:50Z"
+    message: install strategy completed with no errors
+    phase: Succeeded
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-02T00:19:05Z"
+    lastUpdateTime: "2020-08-02T00:19:05Z"
+    message: requirements no longer met
+    phase: Failed
+    reason: RequirementsNotMet
+  - lastTransitionTime: "2020-08-02T00:19:29Z"
+    lastUpdateTime: "2020-08-02T00:19:29Z"
+    message: install strategy completed with no errors
+    phase: Succeeded
+    reason: InstallSucceeded
+  - lastTransitionTime: "2020-08-02T00:19:51Z"
+    lastUpdateTime: "2020-08-02T00:19:51Z"
+    message: requirements no longer met
+    phase: Failed
+    reason: RequirementsNotMet
+  - lastTransitionTime: "2020-08-02T00:20:05Z"
+    lastUpdateTime: "2020-08-02T00:20:05Z"
+    message: install strategy completed with no errors
+    phase: Succeeded
+    reason: InstallSucceeded
+  lastTransitionTime: "2020-08-02T00:20:05Z"
+  lastUpdateTime: "2020-08-02T00:20:05Z"
+  message: install strategy completed with no errors
+  phase: Succeeded
+  reason: InstallSucceeded
+  requirementStatus:
+  - group: operators.coreos.com
+    kind: ClusterServiceVersion
+    message: CSV minKubeVersion (1.14.0) less than server version (v1.17.1+f63db30)
+    name: local-storage-operator.4.4.0-202007120152.p0
+    status: Present
+    version: v1alpha1
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    message: CRD is present and Established condition is true
+    name: localvolumes.local.storage.openshift.io
+    status: Present
+    uuid: b0673f88-e9aa-42ad-8382-b863088d4a94
+    version: v1beta1
+  - dependents:
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: namespaced rule:{"verbs":["*"],"apiGroups":["local.storage.openshift.io"],"resources":["*"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: namespaced rule:{"verbs":["*"],"apiGroups":[""],"resources":["pods","services","endpoints","persistentvolumeclaims","events","configmaps","secrets"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: namespaced rule:{"verbs":["get","list","watch","create","update","patch","delete"],"apiGroups":["rbac.authorization.k8s.io"],"resources":["roles"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: namespaced rule:{"verbs":["*"],"apiGroups":["apps"],"resources":["deployments","daemonsets","replicasets","statefulsets"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["*"],"apiGroups":["storage.k8s.io"],"resources":["storageclasses"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["get","list","watch","create","update","patch","delete"],"apiGroups":["rbac.authorization.k8s.io"],"resources":["clusterroles","clusterrolebindings","rolebindings"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["get","list","watch","create","update","patch","delete"],"apiGroups":[""],"resources":["serviceaccounts"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["*"],"apiGroups":[""],"resources":["persistentvolumeclaims","events"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["*"],"apiGroups":["events.k8s.io"],"resources":["events"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["get"],"apiGroups":[""],"resources":["nodes"]}
+      status: Satisfied
+      version: v1beta1
+    - group: rbac.authorization.k8s.io
+      kind: PolicyRule
+      message: cluster rule:{"verbs":["get","list","watch","create","delete"],"apiGroups":[""],"resources":["persistentvolumes"]}
+      status: Satisfied
+      version: v1beta1
+    group: ""
+    kind: ServiceAccount
+    message: ""
+    name: local-storage-operator
+    status: Present
+    version: v1
+  - group: ""
+    kind: ServiceAccount
+    message: Service account does not exist
+    name: local-storage-admin
+    status: NotPresent
+    version: v1

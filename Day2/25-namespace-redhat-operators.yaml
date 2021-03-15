@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    openshift.io/sa.scc.mcs: s0:c24,c19
+    openshift.io/sa.scc.supplemental-groups: 1000590000/10000
+    openshift.io/sa.scc.uid-range: 1000590000/10000
+  name: openshift-operators-redhat
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

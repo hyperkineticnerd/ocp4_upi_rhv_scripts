@@ -1,0 +1,30 @@
+# oc adm groups sync --sync-config=./usersync.yaml --whitelist=./whitelist.txt --confirm
+# oc adm policy add-cluster-role-to-group cluster-admin openshift_admins
+# oc adm groups prune --sync-config=./usersync.yaml --whitelist=./whitelist --confirm
+# ---
+kind: LDAPSyncConfig
+apiVersion: v1
+url: ldap://ipa.hkn.lab:636
+insecure: false
+ca: "<relative/link/to/cert.pem>"
+bindDN: "uid=ldap,cn=users,cn=accounts,dc=hkn,dc=lab"
+bindPassword: "<password>"
+groupUIDNameMapping:
+  "cn=openshift-admins,cn=groups,cn=accounts,dc=hkn,dc=lab": openshift-admins
+rfc2307:
+  groupsQuery:
+    baseDN: "cn=accounts,dc=hkn,dc=lab"
+    scope: sub
+    derefAliases: never
+    filter: (objectClass=groupOfNames)
+    pageSize: 0
+  groupUIDAttribute: dn
+  groupNameAttributes: [ cn ]
+  groupMembershipAttributes: [ member ]
+  usersQuery:
+    baseDN: "cn=users,cn=accounts,dc=hkn,dc=lab"
+    scope: sub
+    derefAliases: never
+    pageSize: 0
+  userUIDAttribute: dn
+  userNameAttributes: [ uid ]

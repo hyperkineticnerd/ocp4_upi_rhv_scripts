@@ -1,0 +1,21 @@
+apiVersion: operator.openshift.io/v1alpha1                                                          
+kind: ImageContentSourcePolicy                                                                      
+metadata:                                                                                           
+  name: missing-ocs-operators                                                                            
+spec:                                                                                               
+  repositoryDigestMirrors:                                                                          
+  - mirrors:                                                                                        
+    - nexus.developer.hkn.lab:5000/ocs4                                                             
+    source: registry.redhat.io/ocs4                                                                 
+  - mirrors:                                                                                        
+    - nexus.developer.hkn.lab:5000/rhceph                                                           
+    source: registry.redhat.io/rhceph                                                               
+  - mirrors:                                                                                        
+    - nexus.developer.hkn.lab:5000/noobaa                                                           
+    source: quay.io/noobaa                                                                          
+  - mirrors:                                                                                        
+    - nexus.developer.hkn.lab:5000/openshift4                                                       
+    source: registry.redhat.io/openshift4                                                           
+  - mirrors:                                                                                        
+    - nexus.developer.hkn.lab:5000/rhscl                                                            
+    source: registry.redhat.io/rhscl                                                                

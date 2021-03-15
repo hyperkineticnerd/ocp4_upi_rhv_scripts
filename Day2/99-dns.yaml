@@ -1,0 +1,31 @@
+apiVersion: operator.openshift.io/v1
+kind: DNS
+metadata:
+  name: default
+spec:
+  servers:
+    - name : hkn-lab-server
+      zones:
+        - hkn.lab
+      forwardPlugin:
+        upstreams:
+          - 172.16.0.9
+          - 172.16.3.1
+    - name : quay-io-server
+      zones:
+        - quay.io
+      forwardPlugin:
+        upstreams:
+          - 1.1.1.1
+          - 1.0.0.1
+          - 8.8.8.8
+          - 8.8.4.4
+    - name : redhat-com-server
+      zones:
+        - redhat.com
+      forwardPlugin:
+        upstreams:
+          - 1.1.1.1
+          - 1.0.0.1
+          - 8.8.8.8
+          - 8.8.4.4

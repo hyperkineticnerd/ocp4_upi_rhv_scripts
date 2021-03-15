@@ -1,0 +1,20 @@
+apiVersion: local.storage.openshift.io/v1
+kind: LocalVolume
+metadata:
+  name: local-block
+  namespace: openshift-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+    - matchExpressions:
+        - key: cluster.ocs.openshift.io/openshift-storage
+          operator: In
+          values:
+          - ""
+  storageClassDevices:
+    - storageClassName: localblock
+      volumeMode: Block
+      devicePaths:
+        - /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_43d3fd86-e68e-4a60-b640-00b6a2608702
+        - /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_c1849fea-a1dd-4136-b4bf-cafa5e32e244
+        - /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_da2c7830-b3af-4b07-b01d-7cc010359839

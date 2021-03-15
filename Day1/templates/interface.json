@@ -1,0 +1,4 @@
+{
+  "contents": "[Match]\nName=\($IFACE)\n\n[Network]\nAddress=\($IP)/16\nGateway=\($GATEWAY)\nDNS=\($DNS1)\nDNS=\($DNS2)",
+  "name" : "00-\($IFACE).network"
+}

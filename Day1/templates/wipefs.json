@@ -1,0 +1,7 @@
+{
+    "device" :"/dev/disk/by-label/crypt_rootfs",
+    "wipeTable": true,
+    "partitions": [
+    ]
+}
+
